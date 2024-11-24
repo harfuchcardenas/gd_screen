@@ -1,38 +1,44 @@
 #include <EEPROM.h>
 #include <SPI.h>
-#include <GD2.h>
+#include "GD2.h"
+#include "transports/wiring.h"
 
-//#define __DUE__
+#define SPIDRIVER
+#define ESP32
 
-GDClass GD;
-byte ft8xx_model;
+extern GDClass GD;
+extern GDTransport GDT;
+extern byte ft8xx_model;
 
 void TFT_4_3()
-{ 
-  
-  Serial.println("READY");
-  GD.wr16(REG_HCYCLE, 548);
-  GD.wr16(REG_HOFFSET, 43);
+{
+  GDT.hostcmd(0x44); //send CLKEXT to FT81X
+  GDT.hostcmd(0x00); //send ACTIVE to FT81X
+
+  GD.wr16(REG_HSIZE, 800);
+  GD.wr16(REG_HCYCLE, 928);
+  GD.wr16(REG_HOFFSET, 88);
   GD.wr16(REG_HSYNC0, 0);
-  GD.wr16(REG_HSYNC1, 41);
-  GD.wr16(REG_VCYCLE, 292);
-  GD.wr16(REG_VOFFSET, 12);
+  GD.wr16(REG_HSYNC1, 48);
+  GD.wr16(REG_VSIZE, 480);
+  GD.wr16(REG_VCYCLE, 525);
+  GD.wr16(REG_VOFFSET, 32);
   GD.wr16(REG_VSYNC0, 0);
-  GD.wr16(REG_VSYNC1, 10);
+  GD.wr16(REG_VSYNC1, 3);
+  GD.wr16(REG_PCLK, 2);
   GD.wr16(REG_SWIZZLE, 0);
   GD.wr16(REG_PCLK_POL, 1);
-  GD.wr16(REG_CSPREAD, 1);
-  GD.wr16(REG_HSIZE, 800);
-  GD.wr16(REG_VSIZE, 482);
+  GD.wr16(REG_CSPREAD, 0);
+  GD.wr16(REG_DITHER, 1);
+  GD.wr16(REG_ROTATE, 0);
+  GD.swap();
 }
-
 void setup()
 {
-  pinMode(4, OUTPUT);           // set pin to output
-  digitalWrite(4, HIGH);       // turn on pullup resistors
-  delay(20000);
-  GD.begin(0,15,5);
+  Serial.begin(115200);
+  GD.begin(0, 5, 22);
   TFT_4_3();
+
 }
 void loop()
 {
@@ -40,4 +46,5 @@ void loop()
   GD.Clear();
   GD.cmd_text(GD.w / 2, GD.h / 2, 31, OPT_CENTER, "Hello world");
   GD.swap();
+  delay(1000);
 }
