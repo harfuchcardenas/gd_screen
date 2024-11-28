@@ -7,11 +7,11 @@
 #define ESP32
 
 extern GDClass GD;
-extern GDTransport GDT;
 extern byte ft8xx_model;
 
 void TFT_4_3()
 {
+  GDTransport GDT;
   GDT.hostcmd(0x44); //send CLKEXT to FT81X
   GDT.hostcmd(0x00); //send ACTIVE to FT81X
 
@@ -36,7 +36,7 @@ void TFT_4_3()
 void setup()
 {
   Serial.begin(115200);
-  GD.begin(0, 5, 22);
+  GD.begin(0, 17, 22);
   TFT_4_3();
 
 }
